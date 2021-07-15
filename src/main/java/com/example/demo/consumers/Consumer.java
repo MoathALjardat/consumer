@@ -38,9 +38,11 @@ public class Consumer {
         });
     }
 
-    public void sendToProducer() throws InterruptedException {
+    public boolean sendToProducer() throws InterruptedException {
 
         Thread.sleep(2000);
         this.thread.start();
+        return true ;
+
     }
 }
