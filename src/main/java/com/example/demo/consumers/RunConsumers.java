@@ -1,7 +1,7 @@
 package com.example.demo.consumers;
 
 import com.example.demo.requset.RequestsAndResponses;
-import com.example.demo.student.models.Student;
+import com.example.demo.student.Student;
 
 import java.io.IOException;
 import java.time.LocalDateTime;

@@ -1,9 +1,8 @@
 package com.example.demo.requset;
 
-import com.example.demo.student.models.Student;
+import com.example.demo.student.Student;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
-import org.springframework.web.client.RestTemplate;
 
 import java.io.BufferedReader;
 import java.io.IOException;

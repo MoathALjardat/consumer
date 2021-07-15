@@ -1,4 +1,4 @@
-package com.example.demo.student.models;
+package com.example.demo.student;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
