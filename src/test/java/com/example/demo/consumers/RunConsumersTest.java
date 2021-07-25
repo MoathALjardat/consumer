@@ -22,7 +22,7 @@ public class RunConsumersTest {
 
         when(arrayListOfConsumers.size()).thenReturn(5);
 
-        Consumer consumer = new Consumer();
+        Consumer consumer = mock(Consumer.class);
 
         when(arrayListOfConsumers.get(anyInt())).thenReturn(consumer);
         when(consumer.sendToProducer()).thenReturn(true);

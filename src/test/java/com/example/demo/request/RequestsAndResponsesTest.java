@@ -1,113 +1,140 @@
 package com.example.demo.request;
 
 import com.example.demo.student.Student;
+
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
 import com.google.gson.Gson;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.platform.runner.JUnitPlatform;
+import org.junit.runner.RunWith;
+
+import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.net.URL;
-import java.net.URLConnection;
+import java.lang.reflect.Type;
+
+import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.assertj.core.api.Assertions.assertThat;
+
+import static org.mockito.ArgumentMatchers.anyObject;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+
+@RunWith(JUnitPlatform.class)
 @ExtendWith(MockitoExtension.class)
 public class RequestsAndResponsesTest {
 
+    @Mock
+    BufferedReader responseReader;
 
     @Test
     @DisplayName("check if requestForCountMethod work successfully")
-    public  void requestForCountTest() throws IOException {
+    public void requestForCountTest() throws IOException {
 
+        when(responseReader.readLine()).thenReturn("4");
 
-        int numberOfStudents ;
+        String lineFromJson;
 
-        //MockedStatic<Integer> numberOfStudents = Mockito.mockStatic(Integer.class);
-        assertNotNull(numberOfStudents);
+        int numberOfStudent = 4;
+        int numberOfStudentsToCheck = 0;
 
-        when(numberOfStudents.toString()).thenReturn("5");
-        assertEquals(numberOfStudents.toString(), "5");
+        lineFromJson = responseReader.readLine();
+        numberOfStudentsToCheck = Integer.parseInt(lineFromJson);
+
+        assertThat(numberOfStudentsToCheck).isEqualTo(numberOfStudent);
+
 
     }
 
     @Test
     @DisplayName("check if the Gson is convert a json to object successfully and the response have the true value for the gpa for the student mujahed")
-    public  void requestForGpaTest() throws IOException {
+    public void requestForGpaTest() throws IOException {
 
-        URL url = mock(URL.class);
-
-        URLConnection urlConnection = mock(URLConnection.class);
-
-        BufferedReader responseReader = mock(BufferedReader.class);
 
         StringBuilder jsonStringBuilder = new StringBuilder("{\"id\":2,\"name\":\"mujahed\",\"age\":21,\"gpa\":98.0,\"major\":\"ce\"}");
 
         Gson gson = mock(Gson.class);
 
-        Student studentFromGson = gson.fromJson(jsonStringBuilder.toString(), Student.class);
+        Student studentFromGson = new Student(2, "mujahed", 21, 98.0, "ce");
 
+        when(gson.fromJson(String.valueOf(jsonStringBuilder), Student.class)).thenReturn(studentFromGson);
 
-        Student studentForTest = mock(Student.class);
-        studentForTest.setId(2);
-        studentForTest.setGpa(98.0);
-        studentForTest.setAge(21);
+        Student studentForTest = gson.fromJson(jsonStringBuilder.toString(), Student.class);
 
-        assertEquals(studentForTest.getId(), studentFromGson.getId(), "This test should return true");
-        assertEquals(studentForTest.getGpa(), studentFromGson.getGpa(), "This test should return true");
-        assertEquals(studentForTest.getAge(), studentFromGson.getAge(), "This test should return true");
+        assertThat(studentForTest).isEqualTo(studentFromGson);
 
     }
 
+
     @Test
     @DisplayName("check if the Gson is convert a json to objects successfully and the response have the true value of the students have more than 50 in gpa")
-    public  void getStudentsThierMarkesAbove50Test() throws IOException {
+    public void getStudentsThierMarkesAbove50Test() throws IOException {
 
-        URL url = mock(URL.class);
-        URLConnection urlConnection = mock(URLConnection.class);
-        BufferedReader responseReader = mock(BufferedReader.class);
 
-        StringBuilder jsonStringBuilder = new StringBuilder("[{\"id\":1,\"name\":\"moath\",\"age\":18,\"gpa\":99.0,\"major\":\"cs\"},{\"id\":2,\"name\":\"mujahed\",\"age\":21,\"gpa\":98.0,\"major\":\"ce\"},{\"id\":3,\"name\":\"layth\",\"age\":25,\"gpa\":97.0,\"major\":\"me\"}]");
+        StringBuilder jsonStringBuilder = new StringBuilder("[{\"id\":1,\"name\":\"moath\",\"age\":18,\"gpa\":99.0,\"major\":\"cs\"},{\"id\":2,\"name\":\"mujahed\",\"age\":21,\"gpa\":98.0,\"major\":\"ce\"},{\"id\":3,\"name\":\"layth\",\"age\":25,\"gpa\":98.0,\"major\":\"cs\"}]");
+
+
+        Student student1 = new Student(1, "moath", 18, 99.9, "cs");
+        Student student2 = new Student(2, "mojahed", 21, 98.0, "ce");
+        Student student3 = new Student(3, "layth", 25, 98.0, "cs");
+
+        List<Student> studentsAbove50 = new ArrayList<Student>();
+        studentsAbove50.add(student1);
+        studentsAbove50.add(student2);
+        studentsAbove50.add(student3);
+
 
         ObjectMapper objectMapper = mock(ObjectMapper.class);
-
         objectMapper.writerWithDefaultPrettyPrinter();
 
-        List<Student> studentsAbove50 = null;
+        List<Student> studentsAbove50ForTest = null;
 
-        try {
-            studentsAbove50 = objectMapper.readValue(jsonStringBuilder.toString(), objectMapper.getTypeFactory().constructCollectionType(List.class, Student.class));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        when(objectMapper.readValue(anyString(),
+                (TypeReference<Object>) anyObject())).
+                thenReturn(studentsAbove50);
 
-        assertNotNull(studentsAbove50);
+        studentsAbove50ForTest = objectMapper.readValue(jsonStringBuilder.toString(), new TypeReference<List<Student>>() {
+            @Override
+            public Type getType() {
+                return super.getType();
+            }
+
+            @Override
+            public int compareTo(TypeReference<List<Student>> o) {
+                return super.compareTo(o);
+            }
+        });
+
+        assertThat(studentsAbove50ForTest).isEqualTo(studentsAbove50);
 
     }
 
     @Test
     @DisplayName("check if the Gson is convert a json to objects successfully and the response have the true value of the student that have the highest gpa")
-    public  void requestForMaxGpaTest() throws IOException{
-
-        URL url = mock(URL.class);
-        URLConnection urlConnection = mock(URLConnection.class);
-        BufferedReader responseReader = mock(BufferedReader.class);
+    public void requestForMaxGpaTest() throws IOException {
 
         StringBuilder jsonStringBuilder = new StringBuilder("{\"id\":1,\"name\":\"moath\",\"age\":18,\"gpa\":99.0,\"major\":\"cs\"}");
 
         Gson gson = mock(Gson.class);
 
-        Student studentHaveMaxGpa = mock(Student.class);
-        studentHaveMaxGpa = gson.fromJson(jsonStringBuilder.toString(), Student.class);
+        Student studentFromGson = new Student(1, "moath", 18, 99.9, "cs");
 
-        assertNotNull(studentHaveMaxGpa);
+        when(gson.fromJson(String.valueOf(jsonStringBuilder), Student.class)).thenReturn(studentFromGson);
+
+        Student studentForTest = gson.fromJson(jsonStringBuilder.toString(), Student.class);
+
+        assertThat(studentForTest).isEqualTo(studentFromGson);
 
     }
 

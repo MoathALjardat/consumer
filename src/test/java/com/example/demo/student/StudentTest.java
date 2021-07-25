@@ -1,8 +1,6 @@
 package com.example.demo.student;
 
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 
 import java.util.logging.Logger;
 
@@ -30,6 +28,8 @@ public class StudentTest {
     }
 
     @Test
+    @DisplayName("Check if the constructor is run successfully")
+    @Tag("Constructor")
     public void testStudentDetails() throws Exception {
         assertEquals(EXPECTED_ID, student.getId());
         assertEquals(EXPECTED_NAME, student.getName());
